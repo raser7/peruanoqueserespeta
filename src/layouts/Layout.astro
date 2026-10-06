@@ -18,7 +18,16 @@ const structuredData = JSON.stringify({
       '@id': `${site.url}#website`,
       url: site.url,
       name: site.name,
+      alternateName: 'peruanoqueserespeta.com',
       inLanguage: 'es-PE',
+      publisher: { '@id': `${site.url}#organization` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${site.url}#organization`,
+      name: site.name,
+      url: site.url,
+      logo: new URL(site.logo, site.url).href,
     },
     {
       '@type': 'WebPage',
@@ -43,8 +52,8 @@ const structuredData = JSON.stringify({
     <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#f52a91" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={site.name} />
+    <meta property="og:description" content={site.socialDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content="es_PE" />
@@ -52,12 +61,12 @@ const structuredData = JSON.stringify({
     <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Peruano que se respeta — Canales de Telegram" />
+    <meta property="og:image:alt" content="Peruano que se Respeta — Apuestas deportivas en Telegram" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
+    <meta name="twitter:title" content={site.name} />
+    <meta name="twitter:description" content={site.socialDescription} />
     <meta name="twitter:image" content={image} />
-    <meta name="twitter:image:alt" content="Peruano que se respeta — Canales de Telegram" />
+    <meta name="twitter:image:alt" content="Peruano que se Respeta — Apuestas deportivas en Telegram" />
     <script type="application/ld+json" set:html={structuredData} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

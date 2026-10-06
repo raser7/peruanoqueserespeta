@@ -2,7 +2,8 @@
 
 Dominio principal: https://www.peruanoqueserespeta.com/
 El dominio sin www debe mantener su redirección 308 hacia www en Vercel.
-Las mejoras están enfocadas en las búsquedas de la marca y sus canales de Telegram.
+Las mejoras están enfocadas en la marca, apuestas deportivas en Telegram y entretenimiento en Perú.
+La primera pantalla conserva los cuatro accesos; debajo hay contenido visible para explicar la página y cómo usar los canales.
 No garantizan una posición: Google decide cuándo indexa y cómo ordena los resultados.
 
 ## Después de fusionar y desplegar
@@ -19,9 +20,9 @@ No garantizan una posición: Google decide cuándo indexa y cómo ordena los res
 
 - Los metadatos y el dominio canónico se definen en `src/data/site.ts`; el dominio de Astro también está en `astro.config.mjs`.
 - Sitemap y robots se generan durante el build, sin servicios adicionales.
-- La imagen para compartir se genera con `node scripts/generate-social-image.mjs` y se entrega en `public/social-preview.png`.
+- La imagen para compartir y el logo de Organization se generan con `node scripts/generate-social-image.mjs` y se entregan en `public/social-preview.png` y `public/logo.png`.
 - Mantén enlaces a esta web desde los perfiles y canales reales de la marca, con su nombre correcto.
-- Para competir por otras búsquedas hará falta contenido visible y útil relacionado con esas búsquedas. Una página con cuatro enlaces tiene un alcance limitado para temas amplios.
+- Para ampliar la captación, una fase posterior puede incorporar guías sobre canales de apuestas en Telegram y conceptos deportivos. Cada guía debe responder a una pregunta distinta con contenido útil, ejemplos y revisión del responsable de la marca; no publicar páginas duplicadas que solo cambien palabras clave.
 - No agregues listas ocultas de palabras clave ni afirmaciones, reseñas o datos estructurados inventados.
 
 Referencias: https://developers.google.com/search/docs/fundamentals/seo-starter-guide y https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl
