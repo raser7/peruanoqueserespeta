@@ -1,12 +1,45 @@
 ---
 import '../styles/global.css';
+import { site } from '../data/site';
 
 interface Props {
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
 }
 
-const { title, description } = Astro.props;
+const { title = site.title, description = site.description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const image = new URL(site.image, site.url).href;
+const structuredData = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${site.url}#website`,
+      url: site.url,
+      name: site.name,
+      alternateName: 'peruanoqueserespeta.com',
+      inLanguage: 'es-PE',
+      publisher: { '@id': `${site.url}#organization` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${site.url}#organization`,
+      name: site.name,
+      url: site.url,
+      logo: new URL(site.logo, site.url).href,
+    },
+    {
+      '@type': 'WebPage',
+      '@id': `${canonical}#webpage`,
+      url: canonical,
+      name: title,
+      description,
+      inLanguage: 'es-PE',
+      isPartOf: { '@id': `${site.url}#website` },
+    },
+  ],
+}).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -15,10 +48,26 @@ const { title, description } = Astro.props;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href={canonical} />
     <meta name="theme-color" content="#f52a91" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:title" content={site.name} />
+    <meta property="og:description" content={site.socialDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="es_PE" />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Peruano que se Respeta — Apuestas deportivas en Telegram" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={site.name} />
+    <meta name="twitter:description" content={site.socialDescription} />
+    <meta name="twitter:image" content={image} />
+    <meta name="twitter:image:alt" content="Peruano que se Respeta — Apuestas deportivas en Telegram" />
+    <script type="application/ld+json" set:html={structuredData} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />

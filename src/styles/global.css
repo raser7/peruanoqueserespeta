@@ -29,6 +29,15 @@ body { margin: 0; }
 .campaign-photo { display: block; object-fit: contain; transition: transform 350ms ease; }
 .campaign:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 4px; }
 .colophon { flex: 0 0 auto; font-size: 8px; font-weight: 600; letter-spacing: .07em; }
+.channel-guide { max-width: 1100px; margin: 0 auto; padding: clamp(32px, 6vw, 72px) 20px; border-top: 2px solid var(--color-ink); }
+.channel-guide h1 { font-family: var(--font-display); font-size: clamp(32px, 5vw, 56px); line-height: 1.15; }
+.guide-subtitle { margin: 16px 0 32px; font-size: clamp(16px, 2vw, 20px); }
+.guide-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
+.channel-guide h2 { margin: 24px 0 12px; font-size: 20px; font-weight: 800; line-height: 1.35; }
+.guide-columns p { margin-bottom: 16px; line-height: 1.75; }
+.guide-link { display: inline-block; padding: 12px 16px; background: var(--color-acid-yellow); border: 2px solid var(--color-ink); font-weight: 700; }
+.guide-link:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 4px; }
+@media (max-width: 700px) { .guide-columns { grid-template-columns: 1fr; gap: 8px; } }
 
 @keyframes poster-arrive {
   from { opacity: 0; transform: scale(.97); }
