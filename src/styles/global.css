@@ -16,12 +16,14 @@ body { margin: 0; }
 .poster-shell { width: min(1800px, 100%); height: 100dvh; padding: clamp(14px, 2vw, 30px); gap: clamp(12px, 2dvh, 20px); }
 .masthead { flex: 0 0 auto; padding-bottom: clamp(10px, 1.8dvh, 18px); border-bottom: 2px solid var(--color-ink); }
 .brand-logo { width: clamp(230px, 31vw, 420px); height: auto; max-height: 11dvh; object-fit: contain; object-position: left; }
-.campaign-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 18px); }
-.campaign { color: var(--color-ink); text-decoration: none; border: 2px solid var(--color-ink); grid-template-columns: 1fr 1fr; isolation: isolate; }
-.campaign--pink { grid-column: span 7; background: var(--color-hot-pink); }
-.campaign--yellow { grid-column: span 5; background: var(--color-acid-yellow); grid-template-columns: 1fr 1.05fr; }
-.campaign--paper { grid-column: span 5; background: var(--color-paper); grid-template-columns: 1fr 1.05fr; }
-.campaign--lime { grid-column: span 7; background: var(--color-lime); }
+.campaign-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 18px); }
+.campaign { grid-column: span 2; color: var(--color-ink); text-decoration: none; border: 2px solid var(--color-ink); grid-template-columns: 1fr 1fr; isolation: isolate; }
+.campaign:nth-child(n + 4) { grid-column: span 3; }
+.campaign--pink { background: var(--color-hot-pink); }
+.campaign--yellow { background: var(--color-acid-yellow); grid-template-columns: 1fr 1.05fr; }
+.campaign--paper { background: var(--color-paper); grid-template-columns: 1fr 1.05fr; }
+.campaign--lime { background: var(--color-lime); }
+.campaign--blue { background: #8de5ff; }
 .campaign-copy { padding: clamp(12px, 1.25vw, 22px); min-height: 0; gap: clamp(10px, 2dvh, 22px); overflow: hidden; }
 .telegram-icon { width: clamp(64px, 14dvh, 160px); height: auto; aspect-ratio: 1; flex-shrink: 0; transition: scale 180ms ease; }
 .campaign-cta { font-family: var(--font-display); font-size: clamp(22px, min(2.8vw, 5dvh), 46px); line-height: 1.1; letter-spacing: .01em; white-space: nowrap; transform-origin: center; }
@@ -68,6 +70,7 @@ body { margin: 0; }
   .campaign:nth-child(2) { animation-delay: 100ms; --motion-offset: -900ms; }
   .campaign:nth-child(3) { animation-delay: 200ms; --motion-offset: -1800ms; }
   .campaign:nth-child(4) { animation-delay: 300ms; --motion-offset: -2700ms; }
+  .campaign:nth-child(5) { animation-delay: 400ms; --motion-offset: -3600ms; }
   .telegram-icon { animation: telegram-float 3600ms ease-in-out var(--motion-offset, 0ms) infinite; }
   .campaign-cta { animation: cta-emphasis 4800ms ease-in-out var(--motion-offset, 0ms) infinite; }
   .campaign-photo { animation: photo-drift 8s ease-in-out var(--motion-offset, 0ms) infinite; }
@@ -95,11 +98,11 @@ body { margin: 0; }
   .poster-shell { height: 100dvh; min-height: 0; padding: 12px; gap: 10px; }
   .masthead { padding-bottom: 8px; }
   .brand-logo { width: 250px; max-width: 55%; max-height: 8dvh; }
-  .campaign-grid { grid-template-columns: 1fr; grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 8px; }
-  .campaign { grid-column: auto; min-height: 0; grid-template-columns: minmax(0, 1fr) 42%; }
-  .campaign-copy { padding: clamp(6px, 1.1dvh, 12px) 10px; gap: clamp(6px, 1dvh, 10px); }
-  .telegram-icon { width: clamp(40px, 8dvh, 88px); }
-  .campaign-cta { font-size: clamp(18px, min(7vw, 4dvh), 32px); }
+  .campaign-grid { grid-template-columns: 1fr; grid-template-rows: repeat(var(--channel-count), minmax(0, 1fr)); gap: 8px; }
+  .campaign:nth-child(n) { grid-column: auto; min-height: 0; grid-template-columns: minmax(0, 1fr) 42%; }
+  .campaign-copy { padding: clamp(6px, 1.1dvh, 12px) 10px; gap: clamp(4px, .8dvh, 8px); }
+  .telegram-icon { width: clamp(32px, 6dvh, 64px); }
+  .campaign-cta { font-size: clamp(18px, min(7vw, 3.3dvh), 28px); }
   .colophon { font-size: 7px; line-height: 1; }
 }
 
@@ -113,7 +116,9 @@ body { margin: 0; }
   .poster-shell { padding: 8px; gap: 6px; }
   .masthead { padding-bottom: 5px; }
   .brand-logo { max-height: 10dvh; }
-  .campaign-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .campaign-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
+  .campaign:nth-child(n) { grid-column: span 2; }
+  .campaign:nth-child(n + 4) { grid-column: span 3; }
   .campaign-copy { padding: 6px 10px; gap: 6px; }
   .telegram-icon { width: clamp(32px, 12dvh, 56px); }
   .campaign-cta { font-size: clamp(18px, 5.5dvh, 26px); }

@@ -11,7 +11,7 @@ import logo from '../assets/images/logo/logo.svg';
       <img class="brand-logo" src={logo.src} width="1189" height="294" alt="Peruano que se Respeta" fetchpriority="high" />
     </header>
     <main id="canales" class="poster-main flex min-h-0 flex-1 flex-col">
-      <div class="campaign-grid grid min-h-0 flex-1" aria-label="Nuestros cuatro canales de Telegram">
+      <div class="campaign-grid grid min-h-0 flex-1" style={`--channel-count: ${campaigns.length}`} aria-label={`Nuestros ${campaigns.length} canales de Telegram`}>
         {campaigns.map((campaign) => <CampaignLink campaign={campaign} />)}
       </div>
     </main>
