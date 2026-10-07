@@ -1,6 +1,6 @@
 # Peruano que se respeta
 
-Microsite one-page en Astro 7, TypeScript y Tailwind CSS 4, ubicada en la raíz del repositorio. Cuatro enlaces de Telegram en una composición de afiche chicha/editorial.
+Microsite one-page en Astro 7, TypeScript y Tailwind CSS 4, ubicada en la raíz del repositorio. Cinco enlaces de Telegram en una composición de afiche chicha/editorial.
 
 ## Desarrollo
 
@@ -24,14 +24,14 @@ La salida estática se genera en `dist/`. `vercel.json` configura Astro, el coma
 
 ## Editar contenido
 
-- `src/data/campaigns.ts`: los cuatro enlaces, CTA y fotografías. Las fotos se asignaron por hora ascendente a los enlaces en el orden proporcionado.
+- `src/data/campaigns.ts`: los cinco enlaces, CTA y fotografías. Las fotos se asignaron por hora ascendente a los enlaces en el orden proporcionado.
 - `src/components/CampaignLink.astro`: pieza visual reutilizable; todo el bloque es un enlace accesible.
 - `src/pages/index.astro`: logo, cabecera y composición general.
 - `src/styles/global.css`: Tailwind, paleta, tipografía y composición responsive.
 - `src/layouts/Layout.astro`: HTML y metadatos.
 - `src/assets/images/`: imágenes originales y logo proporcionados.
 
-Desktop (desde 1024px) ocupa `100dvh` con dos filas asimétricas. Tablet y móvil muestran los cuatro enlaces dentro del viewport, con imágenes pequeñas al lado del texto. En móvil horizontal se usan dos filas de dos enlaces. Las imágenes se optimizan a WebP con tamaños responsive durante la compilación. No se envía JavaScript de aplicación al navegador. Las fuentes Anton y Archivo se cargan desde Google Fonts y tienen alternativas locales.
+Desktop (desde 1024px) ocupa `100dvh` con tres enlaces en la primera fila y dos en la segunda. Tablet y móvil muestran los cinco enlaces dentro del viewport, con imágenes pequeñas al lado del texto. En móvil horizontal se usan dos filas de tres y dos enlaces. Las imágenes se optimizan a WebP con tamaños responsive durante la compilación. No se envía JavaScript de aplicación al navegador. Las fuentes Anton y Archivo se cargan desde Google Fonts y tienen alternativas locales.
 
 ## Compilador en Windows
 
