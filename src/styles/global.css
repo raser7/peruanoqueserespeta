@@ -22,10 +22,10 @@ body { margin: 0; }
 .campaign--yellow { grid-column: span 5; background: var(--color-acid-yellow); grid-template-columns: 1fr 1.05fr; }
 .campaign--paper { grid-column: span 5; background: var(--color-paper); grid-template-columns: 1fr 1.05fr; }
 .campaign--lime { grid-column: span 7; background: var(--color-lime); }
-.campaign-copy { padding: clamp(12px, 1.25vw, 22px); min-height: 0; gap: clamp(10px, 2dvh, 22px); }
+.campaign-copy { padding: clamp(12px, 1.25vw, 22px); min-height: 0; gap: clamp(10px, 2dvh, 22px); overflow: hidden; }
 .telegram-icon { width: clamp(64px, 14dvh, 160px); height: auto; aspect-ratio: 1; flex-shrink: 0; transition: scale 180ms ease; }
 .campaign-cta { font-family: var(--font-display); font-size: clamp(22px, min(2.8vw, 5dvh), 46px); line-height: 1.1; letter-spacing: .01em; white-space: nowrap; transform-origin: center; }
-.campaign-visual { border-left: 2px solid var(--color-ink); background: var(--color-ink); }
+.campaign-visual { border-left: 2px solid var(--color-ink); background: var(--color-ink); overflow: hidden; }
 .campaign-photo { display: block; object-fit: contain; transition: transform 350ms ease; }
 .campaign:focus-visible { outline: 3px solid var(--color-ink); outline-offset: 4px; }
 .colophon { flex: 0 0 auto; font-size: 8px; font-weight: 600; letter-spacing: .07em; }
@@ -36,30 +36,57 @@ body { margin: 0; }
 }
 
 @keyframes telegram-float {
-  0%, 100% { transform: translateY(3px) rotate(-4deg); }
-  50% { transform: translateY(-5px) rotate(4deg); }
+  0%, 100% { transform: translateY(4px) rotate(-6deg); }
+  50% { transform: translateY(-7px) rotate(6deg); }
 }
 
 @keyframes cta-emphasis {
   0%, 65%, 100% { transform: scale(1); }
-  82% { transform: scale(1.04); }
+  82% { transform: scale(1.08); }
+}
+
+@keyframes photo-drift {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+@keyframes poster-shine {
+  0%, 65% { transform: translateX(-180%) skewX(-18deg); opacity: 0; }
+  72% { opacity: .55; }
+  95%, 100% { transform: translateX(350%) skewX(-18deg); opacity: 0; }
+}
+
+@keyframes brand-sway {
+  0%, 100% { transform: translateY(0) rotate(-.5deg); }
+  50% { transform: translateY(-3px) rotate(.5deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .masthead { animation: poster-arrive 500ms ease-out backwards; }
+  .brand-logo { animation: brand-sway 5s ease-in-out infinite; }
   .campaign { animation: poster-arrive 600ms cubic-bezier(.2, .7, .3, 1) backwards; }
   .campaign:nth-child(2) { animation-delay: 100ms; --motion-offset: -900ms; }
   .campaign:nth-child(3) { animation-delay: 200ms; --motion-offset: -1800ms; }
   .campaign:nth-child(4) { animation-delay: 300ms; --motion-offset: -2700ms; }
   .telegram-icon { animation: telegram-float 3600ms ease-in-out var(--motion-offset, 0ms) infinite; }
   .campaign-cta { animation: cta-emphasis 4800ms ease-in-out var(--motion-offset, 0ms) infinite; }
+  .campaign-photo { animation: photo-drift 8s ease-in-out var(--motion-offset, 0ms) infinite; }
+  .campaign-copy::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    pointer-events: none;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / .45), transparent);
+    animation: poster-shine 6500ms ease-in-out var(--motion-offset, 0ms) infinite;
+  }
   .campaign:focus-visible .telegram-icon { animation-play-state: paused; scale: 1.07; }
   .campaign:focus-visible .campaign-cta { animation-play-state: paused; }
   .campaign:active .telegram-icon { scale: .94; }
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .campaign:hover .campaign-photo { transform: scale(1.035); }
+  .campaign:hover .campaign-photo { animation-play-state: paused; scale: 1.035; }
   .campaign:hover .telegram-icon { animation-play-state: paused; scale: 1.07; }
   .campaign:hover .campaign-cta { animation-play-state: paused; }
 }
