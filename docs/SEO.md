@@ -3,7 +3,7 @@
 Dominio principal: https://www.peruanoqueserespeta.com/
 El dominio sin www debe mantener su redirección 308 hacia www en Vercel.
 Las mejoras están enfocadas en la marca, apuestas deportivas en Telegram y entretenimiento en Perú.
-La primera pantalla conserva los cuatro accesos; debajo hay contenido visible para explicar la página y cómo usar los canales.
+La página conserva el diseño de una sola pantalla con los cuatro accesos a Telegram.
 No garantizan una posición: Google decide cuándo indexa y cómo ordena los resultados.
 
 ## Después de fusionar y desplegar
