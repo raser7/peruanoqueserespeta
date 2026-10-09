@@ -18,8 +18,10 @@ body { margin: 0; }
 .brand-logo { width: clamp(230px, 31vw, 420px); height: auto; max-height: 11dvh; object-fit: contain; object-position: left; }
 .campaign-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(var(--desktop-rows, 2), minmax(0, 1fr)); gap: clamp(10px, 1.2vw, 18px); }
 .campaign { grid-column: span 2; color: var(--color-ink); text-decoration: none; border: 2px solid var(--color-ink); grid-template-columns: 1fr 1fr; isolation: isolate; }
-.campaign-grid[data-remainder="2"] .campaign:nth-last-child(-n + 2) { grid-column: span 3; }
-.campaign-grid[data-remainder="1"] .campaign:last-child { grid-column: span 6; }
+@media (min-width: 1024px) {
+  .campaign-grid[data-remainder="2"] .campaign:nth-last-child(-n + 2) { grid-column: span 3; }
+  .campaign-grid[data-remainder="1"] .campaign:last-child { grid-column: span 6; }
+}
 .channels-empty { grid-column: 1 / -1; align-self: center; text-align: center; padding: 20px; }
 .campaign--pink { background: var(--color-hot-pink); }
 .campaign--yellow { background: var(--color-acid-yellow); grid-template-columns: 1fr 1.05fr; }
@@ -123,13 +125,10 @@ body { margin: 0; }
   .poster-shell { padding: 8px; gap: 6px; }
   .masthead { padding-bottom: 5px; }
   .brand-logo { max-height: 10dvh; }
-  .campaign-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); grid-template-rows: repeat(var(--desktop-rows, 2), minmax(0, 1fr)); }
-  .campaign-grid .campaign:nth-child(n) { grid-column: span 2; }
-  .campaign-grid[data-remainder="2"] .campaign:nth-last-child(-n + 2) { grid-column: span 3; }
-  .campaign-grid[data-remainder="1"] .campaign:last-child { grid-column: span 6; }
-  .campaign-copy { padding: 6px 10px; gap: 6px; }
-  .telegram-icon { width: clamp(32px, 12dvh, 56px); }
-  .campaign-cta { font-size: clamp(18px, 5.5dvh, 26px); }
+  .campaign-grid { grid-template-rows: repeat(var(--channel-count), minmax(56px, 1fr)); }
+  .campaign-copy { padding: 4px 10px; gap: 8px; flex-direction: row; }
+  .telegram-icon { width: clamp(24px, 8dvh, 36px); }
+  .campaign-cta { font-size: clamp(16px, 5.5dvh, 22px); }
 }
 
 @media (min-width: 1024px) and (max-height: 620px) {
