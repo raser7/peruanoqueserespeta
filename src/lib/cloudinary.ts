@@ -3,6 +3,10 @@ import { setting } from './admin.ts';
 
 const prefix = 'pqsr/channels/';
 export const themes = ['pink', 'yellow', 'paper', 'lime', 'blue'] as const;
+// Rotate the brand palette deterministically; no image analysis or external API.
+export function automaticTheme(position: number): typeof themes[number] {
+  return themes[Math.max(0, Math.floor(position)) % themes.length];
+}
 export interface Channel {
   id: string; href: string; image: string; imageAlt: string;
   order: number; theme: typeof themes[number]; enabled: boolean;
@@ -66,8 +70,7 @@ export function channelFields(form: FormData) {
   if (!validLink(href)) throw new Error('Usa un enlace válido de Telegram: https://t.me/...');
   const order = Number(form.get('order'));
   if (!Number.isInteger(order) || order < 0 || order > 999) throw new Error('El orden debe estar entre 0 y 999.');
-  const theme = String(form.get('theme')) as Channel['theme'];
-  if (!themes.includes(theme)) throw new Error('Selecciona un color válido.');
+  const theme = automaticTheme(Math.max(0, order - 1));
   const imageAlt = 'Imagen del canal de Telegram';
   return { href, order, theme, imageAlt, enabled: form.get('enabled') === 'true' };
 }

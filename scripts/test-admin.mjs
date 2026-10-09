@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { adminConfigured, authenticated, newSession, sameOrigin } from '../src/lib/admin.ts';
-import { channelFields, deleteChannel, listChannels, updateFields, uploadImage, validLink } from '../src/lib/cloudinary.ts';
+import { automaticTheme, channelFields, deleteChannel, listChannels, updateFields, uploadImage, validLink } from '../src/lib/cloudinary.ts';
 
 process.env.ADMIN_PASSWORD = 'test-password-for-tests-only';
 process.env.ADMIN_SESSION_SECRET = 'test-secret-for-tests-only-1234567890';
@@ -26,9 +26,11 @@ assert.ok(validLink('https://t.me/+qBphnusW2CIwNjFh'));
 assert.equal(validLink('https://t.me.evil.example/+abc'), false);
 assert.equal(validLink('javascript:alert(1)'), false);
 const form = new FormData();
-for (const [key, value] of Object.entries({ href: 'https://t.me/+abc123', order: '2', theme: 'blue', imageAlt: 'Una imagen | ejemplo = prueba', enabled: 'true' })) form.set(key, value);
+for (const [key, value] of Object.entries({ href: 'https://t.me/+abc123', order: '2', imageAlt: 'Una imagen | ejemplo = prueba', enabled: 'true' })) form.set(key, value);
 const fields = channelFields(form);
 assert.equal(fields.imageAlt, 'Imagen del canal de Telegram');
+assert.equal(fields.theme, 'yellow');
+assert.deepEqual(Array.from({ length: 7 }, (_, i) => automaticTheme(i)), ['pink', 'yellow', 'paper', 'lime', 'blue', 'pink', 'yellow']);
 form.set('order', '-1'); assert.throws(() => channelFields(form));
 
 let calls = [];
