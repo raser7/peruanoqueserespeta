@@ -26,7 +26,7 @@ El adaptador oficial de Vercel genera la salida para funciones y archivos estát
 
 Completa los campos de `.env`, reinicia `npm run dev` y entra en `/admin`. El panel permite crear, editar, ordenar, ocultar y eliminar tarjetas. Pulsa **Importar las 5 tarjetas originales** para migrar el contenido inicial a Cloudinary. Consulta [docs/ADMIN.md](docs/ADMIN.md) para configurar las credenciales y el despliegue.
 
-Ejecuta `npm run test:admin` para comprobar sesiones, permisos de origen, enlaces y operaciones Cloudinary con respuestas simuladas. Las pruebas no suben imágenes ni utilizan credenciales reales.
+Ejecuta `npm run test:admin` para comprobar sesiones, permisos de origen, enlaces y operaciones Cloudinary con respuestas simuladas. Las pruebas no suben imágenes ni utilizan credenciales reales. Después de `npm run build`, ejecuta `npm run test:vercel` para comprobar el paquete real de despliegue sin permitir que cargue herramientas nativas de compilación.
 
 ## Editar contenido
 
