@@ -1,0 +1,189 @@
+---
+import { authenticated, adminConfigured } from '../../lib/admin';
+import { cloudConfigured } from '../../lib/cloudinary';
+export const prerender = false;
+const loggedIn = authenticated(Astro);
+const configured = adminConfigured();
+const cloudReady = cloudConfigured();
+Astro.response.headers.set('Cache-Control', 'no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Administrar canales | Peruano que se Respeta</title>
+  </head>
+  <body>
+    <main>
+      <header><div><p class="eyebrow">PERUANO QUE SE RESPETA</p><h1>Administrar canales</h1></div><a href="/" target="_blank" rel="noopener">Ver página ↗</a></header>
+      <p id="notice" role="status" aria-live="polite"></p>
+      {!configured && <p class="warning">Completa ADMIN_PASSWORD (mínimo 8 caracteres) y ADMIN_SESSION_SECRET en el archivo .env. Después reinicia el servidor.</p>}
+      {!loggedIn ? <form id="login-form" class="box login">
+        <h2>Entrar al panel</h2>
+        <label>Contraseña<input type="password" name="password" autocomplete="current-password" required disabled={!configured} /></label>
+        <button disabled={!configured}>Entrar</button>
+      </form> : <>
+        <div class="toolbar"><p>Sube imágenes y administra los enlaces de Telegram.</p><button id="logout" class="secondary">Cerrar sesión</button></div>
+        {!cloudReady && <p class="warning">Completa CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en .env y reinicia el servidor.</p>}
+        <div id="workspace" hidden={!cloudReady}>
+          <div class="toolbar"><button id="new-channel">+ Nueva tarjeta</button><button id="import-channels" class="secondary">Importar las 5 tarjetas originales</button></div>
+          <p class="hint">Después de guardar, la página pública puede tardar unos minutos en actualizarse.</p>
+          <section id="editor" class="box" hidden>
+            <h2 id="editor-title">Nueva tarjeta</h2>
+            <form id="channel-form">
+              <input type="hidden" name="id" />
+              <label>Imagen (JPG, PNG o WebP, máximo 3 MB)<input type="file" name="image" accept="image/jpeg,image/png,image/webp" /></label>
+              <img id="image-preview" alt="Vista previa de la tarjeta" hidden />
+              <label>Enlace de Telegram<input name="href" type="url" placeholder="https://t.me/+..." required /></label>
+              <div class="fields"><label>Orden<input name="order" type="number" min="0" max="999" value="1" required /></label>
+                <label>Color<select name="theme"><option value="pink">Rosado</option><option value="yellow">Amarillo</option><option value="paper">Crema</option><option value="lime">Verde</option><option value="blue">Celeste</option></select></label></div>
+              <label class="check"><input name="enabled" type="checkbox" checked /> Mostrar en la página</label>
+              <div class="toolbar"><button type="submit">Guardar tarjeta</button><button type="button" id="cancel-edit" class="secondary">Cancelar</button></div>
+            </form>
+          </section>
+          <section id="channel-list" aria-label="Tarjetas actuales"></section>
+          <p id="empty" class="box" hidden>No hay tarjetas guardadas. Importa las originales o crea tu primera tarjeta.</p>
+        </div>
+      </>}
+    </main>
+    <script>
+      const notice = document.querySelector<HTMLParagraphElement>('#notice')!;
+      function message(text: string, error = false) { notice.textContent = text; notice.className = error ? 'error' : 'success'; }
+      async function api(path: string, options: RequestInit = {}) {
+        const response = await fetch(path, options);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'No se pudo completar la operación.');
+        return data;
+      }
+      let busy = false;
+      async function run(action: () => Promise<void>) {
+        if (busy) return;
+        busy = true;
+        const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('button'));
+        const original = buttons.map(button => button.disabled);
+        buttons.forEach(button => button.disabled = true);
+        try { await action(); } catch (error) { message(error instanceof Error ? error.message : 'Error de conexión.', true); }
+        finally { buttons.forEach((button, i) => button.disabled = original[i]); busy = false; }
+      }
+      document.querySelector('#login-form')?.addEventListener('submit', event => {
+        event.preventDefault();
+        void run(async () => {
+          const password = new FormData(document.querySelector<HTMLFormElement>('#login-form')!).get('password');
+          await api('/api/admin/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password }) });
+          location.reload();
+        });
+      });
+      document.querySelector('#logout')?.addEventListener('click', () => void run(async () => {
+        await api('/api/admin/session', { method: 'DELETE' }); location.reload();
+      }));
+      type Channel = { id: string; href: string; image: string; imageAlt: string; order: number; theme: string; enabled: boolean };
+      let channels: Channel[] = [];
+      let previewUrl: string | undefined;
+      const form = document.querySelector<HTMLFormElement>('#channel-form');
+      const editor = document.querySelector<HTMLElement>('#editor');
+      const preview = document.querySelector<HTMLImageElement>('#image-preview');
+      function field(name: string) { return form!.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement; }
+      function setPreview(url?: string) {
+        if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = undefined; }
+        preview!.hidden = !url;
+        if (url) preview!.src = url; else preview!.removeAttribute('src');
+      }
+      function edit(channel?: Channel) {
+        form!.reset();
+        field('id').value = channel?.id || '';
+        field('href').value = channel?.href || '';
+        field('order').value = String(channel?.order ?? Math.max(0, ...channels.map(item => item.order)) + 1);
+        field('theme').value = channel?.theme || 'pink';
+        (field('enabled') as HTMLInputElement).checked = channel?.enabled ?? true;
+        (field('image') as HTMLInputElement).required = !channel;
+        document.querySelector('#editor-title')!.textContent = channel ? 'Editar tarjeta' : 'Nueva tarjeta';
+        setPreview(channel?.image);
+        editor!.hidden = false;
+        editor!.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      async function load() {
+        const data = await api('/api/admin/channels');
+        channels = data.channels;
+        const list = document.querySelector('#channel-list')!;
+        list.replaceChildren();
+        document.querySelector<HTMLElement>('#empty')!.hidden = channels.length > 0;
+        for (const channel of channels) {
+          const card = document.createElement('article'); card.className = 'box channel';
+          const image = document.createElement('img'); image.src = channel.image; image.alt = channel.imageAlt || 'Imagen de la tarjeta'; image.loading = 'lazy';
+          const content = document.createElement('div');
+          const title = document.createElement('h2'); title.textContent = `Orden ${channel.order} · ${channel.enabled ? 'Visible' : 'Oculta'}`;
+          const link = document.createElement('a'); link.href = channel.href; link.textContent = channel.href; link.target = '_blank'; link.rel = 'noopener noreferrer';
+          const actions = document.createElement('div'); actions.className = 'toolbar';
+          const editButton = document.createElement('button'); editButton.textContent = 'Editar'; editButton.addEventListener('click', () => edit(channel));
+          const removeButton = document.createElement('button'); removeButton.textContent = 'Eliminar'; removeButton.className = 'danger';
+          removeButton.addEventListener('click', () => {
+            if (!confirm('¿Eliminar esta tarjeta y su imagen? Esta acción no se puede deshacer desde el panel.')) return;
+            void run(async () => {
+              const body = new FormData(); body.set('action', 'delete'); body.set('id', channel.id);
+              await api('/api/admin/channels', { method: 'POST', body });
+              if (field('id').value === channel.id) editor!.hidden = true;
+              await load(); message('Tarjeta eliminada.');
+            });
+          });
+          actions.append(editButton, removeButton); content.append(title, link, actions); card.append(image, content); list.append(card);
+        }
+      }
+      document.querySelector('#new-channel')?.addEventListener('click', () => edit());
+      document.querySelector('#cancel-edit')?.addEventListener('click', () => { editor!.hidden = true; setPreview(); });
+      form?.addEventListener('submit', event => {
+        event.preventDefault();
+        void run(async () => {
+          const body = new FormData(form);
+          body.set('action', field('id').value ? 'update' : 'create');
+          body.set('enabled', String((field('enabled') as HTMLInputElement).checked));
+          await api('/api/admin/channels', { method: 'POST', body });
+          editor!.hidden = true; setPreview(); await load(); message('Tarjeta guardada.');
+        });
+      });
+      form?.querySelector('input[type="file"]')?.addEventListener('change', event => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        setPreview();
+        if (file) { previewUrl = URL.createObjectURL(file); preview!.src = previewUrl; preview!.hidden = false; }
+      });
+      document.querySelector('#import-channels')?.addEventListener('click', () => {
+        if (!confirm('¿Importar las cinco tarjetas originales? Las originales que ya existan no se duplicarán.')) return;
+        void run(async () => {
+          message('Importando las imágenes originales…');
+          const body = new FormData(); body.set('action', 'import');
+          await api('/api/admin/channels', { method: 'POST', body }); await load(); message('Importación terminada.');
+        });
+      });
+      if (form && !document.querySelector<HTMLElement>('#workspace')?.hidden) void run(load);
+    </script>
+    <style>
+      :global(body) { margin: 0; background: #f4f2e9; color: #171714; font-family: Arial, sans-serif; }
+      :global(*) { box-sizing: border-box; }
+      main { max-width: 950px; padding: 28px 18px; margin: auto; }
+      header,.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+      h1 { font-size: clamp(26px,5vw,38px); margin: 8px 0 24px; }
+      h2 { font-size: 20px; margin: 0 0 18px; }
+      .eyebrow { font-size: 12px; font-weight: bold; letter-spacing: .1em; }
+      :global(.box) { padding: 22px; border: 2px solid #171714; background: white; margin: 20px 0; }
+      .login { max-width: 450px; }
+      label { display: block; margin: 16px 0; font-weight: bold; font-size: 14px; }
+      input:not([type=checkbox]),select { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #888; background: white; border-radius: 0; font-size: 16px; }
+      :global(button) { cursor: pointer; border: 2px solid #171714; padding: 12px 18px; background: #fff04a; font-size: 15px; font-weight: bold; }
+      :global(button:disabled) { opacity: .5; cursor: wait; }
+      :global(.secondary) { background: white; } :global(.danger) { background: #ffe4e4; }
+      .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+      .check { display: flex; align-items: center; gap: 10px; } .check input { width: 20px; height: 20px; }
+      #image-preview { width: 150px; height: 150px; object-fit: contain; background: #eee; }
+      :global(.channel) { display: grid; grid-template-columns: 130px 1fr; gap: 20px; }
+      :global(.channel img) { width: 130px; height: 130px; object-fit: contain; }
+      :global(.channel a) { overflow-wrap: anywhere; display: block; margin-bottom: 18px; }
+      #notice:not(:empty),.warning { padding: 16px; border: 1px solid; line-height: 1.5; }
+      .warning { background: #fff6cc; } :global(.error) { background: #ffe4e4; } :global(.success) { background: #dff6e7; }
+      .hint { color: #555; font-size: 14px; }
+      [hidden] { display: none !important; }
+      @media(max-width: 500px) { :global(.channel) { grid-template-columns: 85px 1fr; gap: 12px; } :global(.channel img) { width: 85px; height: 85px; } .fields { grid-template-columns: 1fr; gap: 0; } }
+    </style>
+  </body>
+</html>

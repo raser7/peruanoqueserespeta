@@ -6,9 +6,11 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test:admin": "node --experimental-strip-types scripts/test-admin.mjs"
   },
   "dependencies": {
+    "@astrojs/vercel": "^11.0.13",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.3.6",
     "tailwindcss": "^4.3.3"

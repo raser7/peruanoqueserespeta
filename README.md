@@ -20,7 +20,13 @@ npm run build
 npm run preview
 ```
 
-La salida estática se genera en `dist/`. `vercel.json` configura Astro, el comando de compilación y la carpeta de salida. Importa este repositorio en Vercel usando la raíz del repositorio como directorio del proyecto. No requiere variables de entorno ni adaptador de servidor.
+El adaptador oficial de Vercel genera la salida para funciones y archivos estáticos. Importa este repositorio en Vercel usando la raíz como directorio del proyecto y deja la carpeta de salida en automático. La home y el panel se ejecutan en el servidor para leer y actualizar Cloudinary; robots y sitemap siguen siendo estáticos.
+
+## Panel del cliente
+
+Completa los campos de `.env`, reinicia `npm run dev` y entra en `/admin`. El panel permite crear, editar, ordenar, ocultar y eliminar tarjetas. Pulsa **Importar las 5 tarjetas originales** para migrar el contenido inicial a Cloudinary. Consulta [docs/ADMIN.md](docs/ADMIN.md) para configurar las credenciales y el despliegue.
+
+Ejecuta `npm run test:admin` para comprobar sesiones, permisos de origen, enlaces y operaciones Cloudinary con respuestas simuladas. Las pruebas no suben imágenes ni utilizan credenciales reales.
 
 ## Editar contenido
 
@@ -31,7 +37,7 @@ La salida estática se genera en `dist/`. `vercel.json` configura Astro, el coma
 - `src/layouts/Layout.astro`: HTML y metadatos.
 - `src/assets/images/`: imágenes originales y logo proporcionados.
 
-Desktop (desde 1024px) ocupa `100dvh` con tres enlaces en la primera fila y dos en la segunda. Tablet y móvil muestran los cinco enlaces dentro del viewport, con imágenes pequeñas al lado del texto. En móvil horizontal se usan dos filas de tres y dos enlaces. Las imágenes se optimizan a WebP con tamaños responsive durante la compilación. No se envía JavaScript de aplicación al navegador. Las fuentes Anton y Archivo se cargan desde Google Fonts y tienen alternativas locales.
+El diseño inicial conserva los cinco enlaces en `100dvh`. Las filas se adaptan al número de tarjetas. Las imágenes remotas se optimizan mediante Cloudinary; las imágenes locales usan Astro. La home no envía JavaScript de aplicación; el panel usa un script para los formularios. Las fuentes Anton y Archivo se cargan desde Google Fonts y tienen alternativas locales.
 
 ## Compilador en Windows
 

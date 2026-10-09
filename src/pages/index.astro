@@ -1,8 +1,27 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import CampaignLink from '../components/CampaignLink.astro';
-import { campaigns } from '../data/campaigns';
+import { campaigns as originalCampaigns, type Campaign } from '../data/campaigns';
+import { cloudConfigured, listChannels } from '../lib/cloudinary';
 import logo from '../assets/images/logo/logo.svg';
+export const prerender = false;
+let campaigns: (Omit<Campaign, 'image'> & { image: Campaign['image'] | string })[] = originalCampaigns;
+let unavailable = false;
+if (cloudConfigured()) {
+  try {
+    campaigns = (await listChannels()).filter(channel => channel.enabled).map((channel, index) => ({
+      number: String(index + 1).padStart(2, '0'), cta: 'Entra aquí', href: channel.href,
+      image: channel.image.replace('/image/upload/', '/image/upload/f_auto,q_auto,w_900/'),
+      imageAlt: channel.imageAlt, theme: channel.theme,
+    }));
+  } catch {
+    campaigns = [];
+    unavailable = true;
+    Astro.response.status = 503;
+  }
+}
+Astro.response.headers.set('Cache-Control', unavailable ? 'no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
+const rows = Math.max(1, Math.ceil(campaigns.length / 3));
 ---
 
 <Layout>
@@ -11,8 +30,9 @@ import logo from '../assets/images/logo/logo.svg';
       <img class="brand-logo" src={logo.src} width="1189" height="294" alt="Peruano que se Respeta" fetchpriority="high" />
     </header>
     <main id="canales" class="poster-main flex min-h-0 flex-1 flex-col">
-      <div class="campaign-grid grid min-h-0 flex-1" style={`--channel-count: ${campaigns.length}`} aria-label={`Nuestros ${campaigns.length} canales de Telegram`}>
+      <div class="campaign-grid grid min-h-0 flex-1" data-count={campaigns.length} data-remainder={campaigns.length % 3} style={`--channel-count: ${Math.max(1, campaigns.length)}; --desktop-rows: ${rows}`} aria-label={`Nuestros ${campaigns.length} canales de Telegram`}>
         {campaigns.map((campaign) => <CampaignLink campaign={campaign} />)}
+        {campaigns.length === 0 && <p class="channels-empty">{unavailable ? 'No se pudieron cargar los canales. Vuelve a intentarlo en un momento.' : 'Próximamente encontrarás nuestros canales aquí.'}</p>}
       </div>
     </main>
     <footer class="colophon flex items-center justify-between gap-4 uppercase">

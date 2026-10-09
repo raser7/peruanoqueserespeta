@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import type { Campaign } from '../data/campaigns';
 
-interface Props { campaign: Campaign; }
+interface Props { campaign: Omit<Campaign, 'image'> & { image: Campaign['image'] | string }; }
 const { campaign } = Astro.props;
 ---
 
@@ -21,7 +21,9 @@ const { campaign } = Astro.props;
     <span class="campaign-cta uppercase">{campaign.cta}</span>
   </div>
   <div class="campaign-visual relative min-h-0 min-w-0">
-    <Image
+    {typeof campaign.image === 'string' ? (
+      <img class="campaign-photo h-full w-full" src={campaign.image} alt={campaign.imageAlt} width="900" height="900" loading="eager" decoding="async" />
+    ) : <Image
       class="campaign-photo h-full w-full object-cover"
       src={campaign.image}
       alt={campaign.imageAlt}
@@ -31,6 +33,6 @@ const { campaign } = Astro.props;
       quality={80}
       loading="eager"
       decoding="async"
-    />
+    />}
   </div>
 </a>
