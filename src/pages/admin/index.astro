@@ -38,8 +38,7 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
               <label>Imagen (JPG, PNG o WebP, máximo 3 MB)<input type="file" name="image" accept="image/jpeg,image/png,image/webp" /></label>
               <img id="image-preview" alt="Vista previa de la tarjeta" hidden />
               <label>Enlace de Telegram<input name="href" type="url" placeholder="https://t.me/+..." required /></label>
-              <div class="fields"><label>Orden<input name="order" type="number" min="0" max="999" value="1" required /></label>
-                <label>Color<select name="theme"><option value="pink">Rosado</option><option value="yellow">Amarillo</option><option value="paper">Crema</option><option value="lime">Verde</option><option value="blue">Celeste</option></select></label></div>
+              <label>Orden<input name="order" type="number" min="0" max="999" value="1" required /></label>
               <label class="check"><input name="enabled" type="checkbox" checked /> Mostrar en la página</label>
               <div class="toolbar"><button type="submit">Guardar tarjeta</button><button type="button" id="cancel-edit" class="secondary">Cancelar</button></div>
             </form>
@@ -96,7 +95,6 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
         field('id').value = channel?.id || '';
         field('href').value = channel?.href || '';
         field('order').value = String(channel?.order ?? Math.max(0, ...channels.map(item => item.order)) + 1);
-        field('theme').value = channel?.theme || 'pink';
         (field('enabled') as HTMLInputElement).checked = channel?.enabled ?? true;
         (field('image') as HTMLInputElement).required = !channel;
         document.querySelector('#editor-title')!.textContent = channel ? 'Editar tarjeta' : 'Nueva tarjeta';

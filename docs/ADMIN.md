@@ -19,6 +19,8 @@ Los tres datos de Cloudinary se encuentran en la configuración de API Keys de t
 2. Entra con ADMIN_PASSWORD.
 3. Pulsa **Importar las 5 tarjetas originales** para migrar las imágenes y enlaces actuales. Se omiten los identificadores originales ya importados, por lo que una importación interrumpida se puede reintentar.
 4. Crea tarjetas o edita las existentes. La imagen admite JPG, PNG o WebP de hasta 3 MB. Para cambiar solo el enlace no necesitas volver a subir la imagen.
+Los colores se asignan automáticamente según la posición entre las tarjetas visibles, alternando rosado, amarillo, crema, verde y celeste. Al reordenar, ocultar o eliminar tarjetas, la paleta se ajusta sin repetir colores consecutivos.
+
 5. El orden más bajo aparece primero; puedes ocultar una tarjeta sin eliminarla. Eliminar también borra su imagen de Cloudinary y pide confirmación.
 
 Sin configurar Cloudinary, la home muestra las cinco tarjetas locales. Al configurarlo, Cloudinary pasa a ser la fuente de contenido: importa las tarjetas antes de entregar la web al cliente. Si no hay tarjetas o se eliminan todas, se muestra el estado vacío; las tarjetas locales no reaparecen. Si Cloudinary falla, la página devuelve 503 y un mensaje de disponibilidad temporal.

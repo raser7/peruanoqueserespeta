@@ -2,7 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import CampaignLink from '../components/CampaignLink.astro';
 import { campaigns as originalCampaigns, type Campaign } from '../data/campaigns';
-import { cloudConfigured, listChannels } from '../lib/cloudinary';
+import { automaticTheme, cloudConfigured, listChannels } from '../lib/cloudinary';
 import logo from '../assets/images/logo/logo.svg';
 export const prerender = false;
 let campaigns: (Omit<Campaign, 'image'> & { image: Campaign['image'] | string })[] = originalCampaigns;
@@ -12,7 +12,7 @@ if (cloudConfigured()) {
     campaigns = (await listChannels()).filter(channel => channel.enabled).map((channel, index) => ({
       number: String(index + 1).padStart(2, '0'), cta: 'Entra aquí', href: channel.href,
       image: channel.image.replace('/image/upload/', '/image/upload/f_auto,q_auto,w_900/'),
-      imageAlt: channel.imageAlt, theme: channel.theme,
+      imageAlt: channel.imageAlt, theme: automaticTheme(index),
     }));
   } catch {
     campaigns = [];
