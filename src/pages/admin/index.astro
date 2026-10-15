@@ -14,11 +14,11 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="robots" content="noindex,nofollow" />
-    <title>Administrar canales | Peruano que se Respeta</title>
+    <title>Administrar tarjetas | Peruano que se Respeta</title>
   </head>
   <body>
     <main>
-      <header><div><p class="eyebrow">PERUANO QUE SE RESPETA</p><h1>Administrar canales</h1></div><a href="/" target="_blank" rel="noopener">Ver página ↗</a></header>
+      <header><div><p class="eyebrow">PERUANO QUE SE RESPETA</p><h1>Administrar tarjetas</h1></div><a href="/" target="_blank" rel="noopener">Ver página ↗</a></header>
       <p id="notice" role="status" aria-live="polite"></p>
       {!configured && <p class="warning">Completa ADMIN_PASSWORD (mínimo 8 caracteres) y ADMIN_SESSION_SECRET en el archivo .env. Después reinicia el servidor.</p>}
       {!loggedIn ? <form id="login-form" class="box login">
@@ -26,18 +26,18 @@ Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
         <label>Contraseña<input type="password" name="password" autocomplete="current-password" required disabled={!configured} /></label>
         <button disabled={!configured}>Entrar</button>
       </form> : <>
-        <div class="toolbar"><p>Sube imágenes y administra los enlaces de Telegram.</p><button id="logout" class="secondary">Cerrar sesión</button></div>
+        <div class="toolbar"><p>Sube imágenes y administra sus enlaces.</p><button id="logout" class="secondary">Cerrar sesión</button></div>
         {!cloudReady && <p class="warning">Completa CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET en .env y reinicia el servidor.</p>}
         <div id="workspace" hidden={!cloudReady}>
           <div class="toolbar"><button id="new-channel">+ Nueva tarjeta</button><button id="import-channels" class="secondary">Importar las 5 tarjetas originales</button></div>
-          <p class="hint">Después de guardar, la página pública puede tardar unos minutos en actualizarse.</p>
+          <p class="hint">Los colores son automáticos y las tarjetas cambian de posición cada 2 horas.</p>
           <section id="editor" class="box" hidden>
             <h2 id="editor-title">Nueva tarjeta</h2>
             <form id="channel-form">
               <input type="hidden" name="id" />
               <label>Imagen (JPG, PNG o WebP, máximo 3 MB)<input type="file" name="image" accept="image/jpeg,image/png,image/webp" /></label>
               <img id="image-preview" alt="Vista previa de la tarjeta" hidden />
-              <label>Enlace de Telegram<input name="href" type="url" placeholder="https://t.me/+..." required /></label>
+              <label>Enlace de destino<input name="href" type="url" placeholder="https://ejemplo.com" required /></label>
               <label>Orden<input name="order" type="number" min="0" max="999" value="1" required /></label>
               <label class="check"><input name="enabled" type="checkbox" checked /> Mostrar en la página</label>
               <div class="toolbar"><button type="submit">Guardar tarjeta</button><button type="button" id="cancel-edit" class="secondary">Cancelar</button></div>

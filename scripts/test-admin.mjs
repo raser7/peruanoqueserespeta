@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { rotateCards, rotationInterval, rotationSlot } from '../src/lib/card-order.ts';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { adminConfigured, authenticated, newSession, sameOrigin } from '../src/lib/admin.ts';
@@ -23,12 +24,15 @@ assert.equal(authenticated(context(token)), false);
 assert.equal(sameOrigin(new Request('https://example.com/api', { headers: { origin: 'https://evil.example' } })), false);
 assert.ok(sameOrigin(new Request('https://example.com/api', { headers: { origin: 'https://example.com' } })));
 assert.ok(validLink('https://t.me/+qBphnusW2CIwNjFh'));
-assert.equal(validLink('https://t.me.evil.example/+abc'), false);
+assert.ok(validLink('https://ejemplo.com/ruta?campana=1&destino=2#seccion'));
+assert.ok(validLink('http://ejemplo.com/'));
+assert.ok(validLink('https://wa.me/51999999999'));
+for (const invalid of ['javascript:alert(1)', 'data:text/html,test', 'file:///test', 'ftp://ejemplo.com', '/relativo', 'https://user:password@ejemplo.com']) assert.equal(validLink(invalid), false);
 assert.equal(validLink('javascript:alert(1)'), false);
 const form = new FormData();
-for (const [key, value] of Object.entries({ href: 'https://t.me/+abc123', order: '2', imageAlt: 'Una imagen | ejemplo = prueba', enabled: 'true' })) form.set(key, value);
+for (const [key, value] of Object.entries({ href: 'https://ejemplo.com/?a=1&b=2#oferta', order: '2', imageAlt: 'Una imagen | ejemplo = prueba', enabled: 'true' })) form.set(key, value);
 const fields = channelFields(form);
-assert.equal(fields.imageAlt, 'Imagen del canal de Telegram');
+assert.equal(fields.imageAlt, 'Imagen de la tarjeta');
 assert.equal(fields.theme, 'yellow');
 assert.deepEqual(Array.from({ length: 7 }, (_, i) => automaticTheme(i)), ['pink', 'yellow', 'paper', 'lime', 'blue', 'pink', 'yellow']);
 form.set('order', '-1'); assert.throws(() => channelFields(form));
@@ -57,8 +61,24 @@ const image = new Blob([await readFile(new URL('../src/assets/images/images/phot
 await uploadImage(image, fields, 'pqsr/channels/test');
 assert.ok(calls[2].url.endsWith('/image/upload'));
 assert.equal(calls[2].options.body.get('public_id'), 'pqsr/channels/test');
-assert.ok(calls[2].options.body.get('context').includes('link=https://t.me/+abc123'));
+assert.ok(calls[2].options.body.get('context').includes('link=https://ejemplo.com/?a\\=1&b\\=2#oferta'));
 assert.equal(calls[2].options.body.get('overwrite'), 'true');
 globalThis.fetch = async () => new Response('failed', { status: 401 });
 await assert.rejects(() => listChannels(), /Cloudinary/);
 console.log('OK: sesiones, expiración, origen, enlaces, metadatos firmados, aislamiento de tarjetas, formatos y fallos de Cloudinary. Sin llamadas externas.');
+
+const original = ['a', 'b', 'c', 'd', 'e'];
+assert.equal(rotationSlot(rotationInterval - 1), 0);
+assert.equal(rotationSlot(rotationInterval), 1);
+assert.deepEqual(rotateCards([], 3), []);
+assert.deepEqual(rotateCards(['a'], 3), ['a']);
+for (let slot = 0; slot < 10; slot++) {
+  const before = rotateCards(original, slot);
+  const after = rotateCards(original, slot + 1);
+  assert.equal(new Set(after).size, original.length);
+  assert.deepEqual([...after].sort(), original);
+  assert.ok(after.every((value, index) => value !== before[index]));
+}
+assert.deepEqual(original, ['a', 'b', 'c', 'd', 'e']);
+assert.deepEqual(rotateCards(original, 5), original);
+console.log('OK: enlaces HTTP/HTTPS de cualquier sitio y rotación cada dos horas sin duplicados.');
