@@ -2,11 +2,8 @@ import { createHash, randomUUID } from 'node:crypto';
 import { setting } from './admin.ts';
 
 const prefix = 'pqsr/channels/';
-export const themes = ['pink', 'yellow', 'paper', 'lime', 'blue'] as const;
-// Rotate the brand palette deterministically; no image analysis or external API.
-export function automaticTheme(position: number): typeof themes[number] {
-  return themes[Math.max(0, Math.floor(position)) % themes.length];
-}
+import { themes, automaticTheme } from './card-order.ts';
+export { themes, automaticTheme } from './card-order.ts';
 export interface Channel {
   id: string; href: string; image: string; imageAlt: string;
   order: number; theme: typeof themes[number]; enabled: boolean;
@@ -52,7 +49,7 @@ export async function listChannels(): Promise<Channel[]> {
     const context = resource.context?.custom || {};
     return {
       id: resource.public_id, href: context.link || '', image: resource.secure_url,
-      imageAlt: context.alt || 'Imagen del canal de Telegram', order: Number(context.order) || 0,
+      imageAlt: context.alt || 'Imagen de la tarjeta', order: Number(context.order) || 0,
       theme: themes.includes(context.theme) ? context.theme : 'pink', enabled: context.enabled !== 'false',
     };
   }).filter(channel => validLink(channel.href))
@@ -61,17 +58,16 @@ export async function listChannels(): Promise<Channel[]> {
 export function validLink(link: string) {
   try {
     const url = new URL(link);
-    return url.protocol === 'https:' && url.hostname === 't.me' && !url.username && !url.password
-      && !url.search && !url.hash && /^\/(\+[A-Za-z0-9_-]+|[A-Za-z0-9_]{5,})$/.test(url.pathname);
+    return ['https:', 'http:'].includes(url.protocol) && !!url.hostname && !url.username && !url.password;
   } catch { return false; }
 }
 export function channelFields(form: FormData) {
   const href = String(form.get('href') || '').trim();
-  if (!validLink(href)) throw new Error('Usa un enlace válido de Telegram: https://t.me/...');
+  if (!validLink(href)) throw new Error('Usa un enlace web válido que empiece por https:// o http://.');
   const order = Number(form.get('order'));
   if (!Number.isInteger(order) || order < 0 || order > 999) throw new Error('El orden debe estar entre 0 y 999.');
   const theme = automaticTheme(Math.max(0, order - 1));
-  const imageAlt = 'Imagen del canal de Telegram';
+  const imageAlt = 'Imagen de la tarjeta';
   return { href, order, theme, imageAlt, enabled: form.get('enabled') === 'true' };
 }
 function context(fields: ReturnType<typeof channelFields>) {

@@ -4,6 +4,7 @@ import type { Campaign } from '../data/campaigns';
 
 interface Props { campaign: Omit<Campaign, 'image'> & { image: Campaign['image'] | string }; }
 const { campaign } = Astro.props;
+const isTelegram = new URL(campaign.href).hostname === 't.me';
 ---
 
 <a
@@ -11,12 +12,12 @@ const { campaign } = Astro.props;
   href={campaign.href}
   target="_blank"
   rel="noopener noreferrer"
-  aria-label={`Entra aquí al canal ${campaign.number} de Telegram (se abre en otra pestaña)`}
+  aria-label={`Entra aquí al enlace ${campaign.number} (se abre en otra pestaña)`}
 >
   <div class="campaign-copy relative z-10 flex min-w-0 flex-col items-center justify-center">
     <svg class="telegram-icon" aria-hidden="true" width="120" height="120" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="12" fill="#229ed9" />
-      <path fill="white" d="m5.5 11.6 12.8-5c.6-.2 1.1.2.9.9L17 17.9c-.1.7-.6.9-1.2.5l-3.3-2.4-1.6 1.5c-.2.2-.4.4-.7.4l.2-3.4 6.2-5.6c.3-.3-.1-.4-.4-.2l-7.7 4.9-3.2-1c-.7-.2-.7-.7.2-1Z" />
+      {isTelegram ? <path fill="white" d="m5.5 11.6 12.8-5c.6-.2 1.1.2.9.9L17 17.9c-.1.7-.6.9-1.2.5l-3.3-2.4-1.6 1.5c-.2.2-.4.4-.7.4l.2-3.4 6.2-5.6c.3-.3-.1-.4-.4-.2l-7.7 4.9-3.2-1c-.7-.2-.7-.7.2-1Z" /> : <g fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a4 4 0 0 0 6 .4l3-3a4 4 0 0 0-5.7-5.7l-1.7 1.7M14 11a4 4 0 0 0-6-.4l-3 3a4 4 0 0 0 5.7 5.7l1.7-1.7" /></g>}
     </svg>
     <span class="campaign-cta uppercase">{campaign.cta}</span>
   </div>

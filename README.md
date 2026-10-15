@@ -37,7 +37,7 @@ Ejecuta `npm run test:admin` para comprobar sesiones, permisos de origen, enlace
 - `src/layouts/Layout.astro`: HTML y metadatos.
 - `src/assets/images/`: imágenes originales y logo proporcionados.
 
-El diseño inicial conserva los cinco enlaces en `100dvh`. Las filas se adaptan al número de tarjetas. Las imágenes remotas se optimizan mediante Cloudinary; las imágenes locales usan Astro. La home no envía JavaScript de aplicación; el panel usa un script para los formularios. Las fuentes Anton y Archivo se cargan desde Google Fonts y tienen alternativas locales.
+El diseño inicial conserva los cinco enlaces en `100dvh`. Las filas se adaptan al número de tarjetas. Las imágenes remotas se optimizan mediante Cloudinary; las imágenes locales usan Astro. La home usa un script pequeño para rotar las tarjetas cada dos horas; el panel usa otro para los formularios. Los enlaces admiten cualquier sitio HTTP o HTTPS. Las fuentes Anton y Archivo se cargan desde Google Fonts y tienen alternativas locales.
 
 ## Compilador en Windows
 

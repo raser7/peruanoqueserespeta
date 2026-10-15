@@ -21,7 +21,9 @@ Los tres datos de Cloudinary se encuentran en la configuración de API Keys de t
 4. Crea tarjetas o edita las existentes. La imagen admite JPG, PNG o WebP de hasta 3 MB. Para cambiar solo el enlace no necesitas volver a subir la imagen.
 Los colores se asignan automáticamente según la posición entre las tarjetas visibles, alternando rosado, amarillo, crema, verde y celeste. Al reordenar, ocultar o eliminar tarjetas, la paleta se ajusta sin repetir colores consecutivos.
 
-5. El orden más bajo aparece primero; puedes ocultar una tarjeta sin eliminarla. Eliminar también borra su imagen de Cloudinary y pide confirmación.
+5. El orden define la secuencia base; puedes ocultar una tarjeta sin eliminarla. Eliminar también borra su imagen de Cloudinary y pide confirmación.
+
+Los enlaces admiten cualquier sitio con `https://` o `http://`, incluidas rutas, parámetros y fragmentos. Las tarjetas rotan una posición cada dos horas, de forma que todas pasan por el primer lugar. La rotación se aplica al abrir la página y también mientras está abierta; al volver a una pestaña suspendida se actualiza. No requiere cron, cambios en Cloudinary ni servicios adicionales.
 
 Sin configurar Cloudinary, la home muestra las cinco tarjetas locales. Al configurarlo, Cloudinary pasa a ser la fuente de contenido: importa las tarjetas antes de entregar la web al cliente. Si no hay tarjetas o se eliminan todas, se muestra el estado vacío; las tarjetas locales no reaparecen. Si Cloudinary falla, la página devuelve 503 y un mensaje de disponibilidad temporal.
 
@@ -29,7 +31,7 @@ Sin configurar Cloudinary, la home muestra las cinco tarjetas locales. Al config
 
 En **Project → Settings → Environment Variables**, usa **Import .env** y selecciona el archivo local `.env` con los cinco valores completos. Aplícalos a **Production** y **Preview**, guarda y despliega de nuevo (o fusiona la PR después de guardarlos). También puedes introducir esos cinco valores manualmente. El archivo `.env` local no se sube y no configura Vercel automáticamente. No uses el prefijo PUBLIC_ en ninguna clave.
 
-El adaptador oficial de Vercel ejecuta el panel y la home en el servidor; sitemap y robots siguen siendo estáticos. El contenido público tiene una caché de 60 segundos y puede permanecer hasta unos minutos mientras se actualiza. Los cambios no necesitan commits ni despliegues nuevos.
+El adaptador oficial de Vercel ejecuta el panel y la home en el servidor; sitemap y robots siguen siendo estáticos. El contenido público tiene una caché de hasta 60 segundos, que se acorta al llegar al siguiente cambio de orden. Los cambios no necesitan commits ni despliegues nuevos.
 
 Se almacenan únicamente imágenes con identificadores dentro de `pqsr/channels/`. Cada imagen lleva enlace, orden, color, texto alternativo automático y estado visible en sus metadatos contextuales. No se utiliza una base de datos adicional. No renombres esa carpeta ni borres sus metadatos desde Cloudinary.
 

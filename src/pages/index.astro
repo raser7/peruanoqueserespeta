@@ -3,6 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import CampaignLink from '../components/CampaignLink.astro';
 import { campaigns as originalCampaigns, type Campaign } from '../data/campaigns';
 import { automaticTheme, cloudConfigured, listChannels } from '../lib/cloudinary';
+import { rotateCards, rotationInterval, rotationSlot } from '../lib/card-order';
 import logo from '../assets/images/logo/logo.svg';
 export const prerender = false;
 let campaigns: (Omit<Campaign, 'image'> & { image: Campaign['image'] | string })[] = originalCampaigns;
@@ -20,7 +21,13 @@ if (cloudConfigured()) {
     Astro.response.status = 503;
   }
 }
-Astro.response.headers.set('Cache-Control', unavailable ? 'no-store' : 'public, max-age=0, s-maxage=60, stale-while-revalidate=300');
+const now = Date.now();
+const slot = rotationSlot(now);
+campaigns = rotateCards(campaigns, slot).map((campaign, index) => ({
+  ...campaign, number: String(index + 1).padStart(2, '0'), theme: automaticTheme(index),
+}));
+const cacheSeconds = Math.min(60, Math.floor(((slot + 1) * rotationInterval - now) / 1000));
+Astro.response.headers.set('Cache-Control', unavailable ? 'no-store' : `public, max-age=0, s-maxage=${cacheSeconds}, must-revalidate`);
 const rows = Math.max(1, Math.ceil(campaigns.length / 3));
 ---
 
@@ -30,14 +37,43 @@ const rows = Math.max(1, Math.ceil(campaigns.length / 3));
       <img class="brand-logo" src={logo.src} width="1189" height="294" alt="Peruano que se Respeta" fetchpriority="high" />
     </header>
     <main id="canales" class="poster-main flex min-h-0 flex-1 flex-col">
-      <div class="campaign-grid grid min-h-0 flex-1" data-count={campaigns.length} data-remainder={campaigns.length % 3} style={`--channel-count: ${Math.max(1, campaigns.length)}; --desktop-rows: ${rows}`} aria-label={`Nuestros ${campaigns.length} canales de Telegram`}>
+      <div class="campaign-grid grid min-h-0 flex-1" data-rotation-slot={slot} data-count={campaigns.length} data-remainder={campaigns.length % 3} style={`--channel-count: ${Math.max(1, campaigns.length)}; --desktop-rows: ${rows}`} aria-label={`Nuestros ${campaigns.length} enlaces`}>
         {campaigns.map((campaign) => <CampaignLink campaign={campaign} />)}
         {campaigns.length === 0 && <p class="channels-empty">{unavailable ? 'No se pudieron cargar los canales. Vuelve a intentarlo en un momento.' : 'Próximamente encontrarás nuestros canales aquí.'}</p>}
       </div>
     </main>
     <footer class="colophon flex items-center justify-between gap-4 uppercase">
       <p>Peruano que se Respeta.</p>
-      <p>Todos los caminos llevan a Telegram <span aria-hidden="true">↗</span></p>
+      <p>Encuentra tu próximo destino <span aria-hidden="true">↗</span></p>
     </footer>
   </div>
 </Layout>
+
+<script>
+  import { rotateCards, rotationInterval, rotationSlot, themes, automaticTheme } from '../lib/card-order';
+  const grid = document.querySelector<HTMLElement>('.campaign-grid');
+  if (grid) {
+    const initialSlot = Number(grid.dataset.rotationSlot);
+    const cards = Array.from(grid.querySelectorAll<HTMLAnchorElement>('.campaign'));
+    let displayedSlot = initialSlot;
+    function updateOrder() {
+      const slot = rotationSlot();
+      if (slot === displayedSlot) return;
+      const focused = document.activeElement;
+      rotateCards(cards, slot - initialSlot).forEach((card, index) => {
+        card.classList.remove(...themes.map(theme => `campaign--${theme}`));
+        card.classList.add(`campaign--${automaticTheme(index)}`);
+        card.setAttribute('aria-label', `Entra aquí al enlace ${String(index + 1).padStart(2, '0')} (se abre en otra pestaña)`);
+        grid!.append(card);
+      });
+      if (focused instanceof HTMLElement && grid!.contains(focused)) focused.focus({ preventScroll: true });
+      displayedSlot = slot;
+    }
+    function schedule() {
+      setTimeout(() => { updateOrder(); schedule(); }, (rotationSlot() + 1) * rotationInterval - Date.now() + 50);
+    }
+    updateOrder();
+    schedule();
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) updateOrder(); });
+  }
+</script>
